@@ -22,15 +22,17 @@ async function getNotionEntries() {
     return response.results.map(page => {
       const title = page.properties.Nombre?.title?.[0]?.plain_text || 'Sin título';
       const description = page.properties.Descripcion?.rich_text[0]?.text.content || 'No se ha proporcionado descripción';
-      console.log(`[${title}] Descripción: ${description
-      }`);
+      console.log(`[${title}] Descripción: ${description}`);
       const status = page.properties.Estado?.status.name || 'Sin Empezar';
       console.log(page.properties);
-      const assignee = page.properties['Asignado a']?.people?.[0]?.name || null;
+      
+      // Get all assignees instead of just the first one
+      const assignees = page.properties['Asignado a']?.people?.map(person => person.name) || [];
+      
       const priority = page.properties.Prioridad?.select?.name || null;
       console.log(page.properties.Prioridad);
-    //   const sprintPlanning = page.properties['Sprint planning']?.select?.name || null;
-    console.log(assignee, priority);
+      console.log('Asignados:', assignees, 'Prioridad:', priority);
+      
       let dueDate = null;
       if (page.properties['Fecha Limite']?.date) {
         dueDate = page.properties['Fecha Limite'].date.start;
@@ -45,9 +47,8 @@ async function getNotionEntries() {
         status,
         description,
         githubStatus,
-        assignee,
+        assignees, // Now returning array of assignees
         priority,
-        // sprintPlanning,
         dueDate,
         lastEdited: page.last_edited_time,
         archived: page.archived || false

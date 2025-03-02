@@ -1,7 +1,7 @@
 const { graphql } = require('@octokit/graphql');
 const { Octokit } = require('@octokit/rest');
 const config = require('../config');
-const { mapUser } = require('../utils/mappers');
+const { mapUser, mapUsers } = require('../utils/mappers');
 
 // Inicializar clientes de GitHub
 const octokit = new Octokit({
@@ -118,20 +118,20 @@ async function createGitHubIssue(task) {
       labels.push(task.priority.toLowerCase());
     }
 
-    const githubUsername = task.assignee ? mapUser(task.assignee) : null;
+    const githubUsernames = task.assignees ? mapUsers(task.assignees) : [];
     let assignees = [];
     
-    if (githubUsername) {
+    for (const username of githubUsernames) {
       // Verificar si el usuario tiene acceso al repositorio
       try {
         await octokit.repos.checkCollaborator({
           owner: config.githubOwner,
           repo: config.githubRepo,
-          username: githubUsername
+          username: username
         });
-        assignees = [githubUsername];
+        assignees.push(username);
       } catch (error) {
-        console.log(`⚠️ El usuario ${githubUsername} no tiene acceso al repositorio. No se puede asignar el issue.`);
+        console.log(`⚠️ El usuario ${username} no tiene acceso al repositorio. No se puede asignar el issue.`);
         console.log('Sugerencia: Asegúrate de que el usuario sea colaborador del repositorio en GitHub.');
       }
     }
@@ -301,20 +301,20 @@ async function updateGitHubIssue(task, issueNumber) {
       labels.push(task.priority.toLowerCase());
     }
 
-    const githubUsername = task.assignee ? mapUser(task.assignee) : null;
+    const githubUsernames = task.assignees ? mapUsers(task.assignees) : [];
     let assignees = [];
     
-    if (githubUsername) {
+    for (const username of githubUsernames) {
       // Verificar si el usuario tiene acceso al repositorio
       try {
         await octokit.repos.checkCollaborator({
           owner: config.githubOwner,
           repo: config.githubRepo,
-          username: githubUsername
+          username: username
         });
-        assignees = [githubUsername];
+        assignees.push(username);
       } catch (error) {
-        console.log(`⚠️ El usuario ${githubUsername} no tiene acceso al repositorio. No se puede asignar el issue.`);
+        console.log(`⚠️ El usuario ${username} no tiene acceso al repositorio. No se puede asignar el issue.`);
         console.log('Sugerencia: Asegúrate de que el usuario sea colaborador del repositorio en GitHub.');
       }
     }

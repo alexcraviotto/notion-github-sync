@@ -35,7 +35,20 @@ function mapUser(notionUser) {
   return githubUser || null;
 }
 
+/**
+ * Mapea múltiples usuarios de Notion a nombres de usuario de GitHub
+ * @param {string[]} notionUsers - Array de nombres de usuario en Notion
+ * @returns {string[]} Array de nombres de usuario en GitHub (filtrados los no mapeados)
+ */
+function mapUsers(notionUsers) {
+  if (!notionUsers || !Array.isArray(notionUsers)) return [];
+  return notionUsers
+    .map(user => mapUser(user))
+    .filter(user => user !== null);
+}
+
 module.exports = {
   mapStatusExact,
-  mapUser
+  mapUser,
+  mapUsers
 };
