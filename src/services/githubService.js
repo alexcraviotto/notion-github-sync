@@ -399,7 +399,7 @@ async function getGitHubIssues() {
     const issues = await octokit.issues.listForRepo({
       owner: config.githubOwner,
       repo: config.githubRepo,
-      state: 'all',
+      state: 'open',
       sort: 'updated',
       direction: 'desc'
     });
