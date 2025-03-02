@@ -74,10 +74,35 @@ function findStatusFieldAndOption(fields, statusName) {
 }
 
 /**
+ * Busca un issue por título
+ */
+async function findIssueByTitle(title) {
+  try {
+    const issues = await octokit.issues.listForRepo({
+      owner: config.githubOwner,
+      repo: config.githubRepo,
+      state: 'all'
+    });
+
+    return issues.data.find(issue => issue.title === title);
+  } catch (error) {
+    console.error('Error buscando issue por título:', error);
+    return null;
+  }
+}
+
+/**
  * Crea un issue en GitHub
  */
 async function createGitHubIssue(task) {
   try {
+    // Verificar si ya existe un issue con el mismo título
+    const existingIssue = await findIssueByTitle(task.title);
+    if (existingIssue) {
+      console.log(`ℹ️ Ya existe un issue con el título: ${task.title}`);
+      return existingIssue;
+    }
+
     const labels = [];
     if (task.priority) {
       try {
@@ -128,7 +153,7 @@ async function createGitHubIssue(task) {
       owner: config.githubOwner,
       repo: config.githubRepo,
       title: task.title,
-      body: `Importado desde Notion: ${task.id}`,
+      body: task.description || 'No hay descripción',
       assignees: assignees,
       labels: labels
     });
@@ -366,6 +391,79 @@ async function processDeletedTask(task, projectInfo) {
   }
 }
 
+/**
+ * Obtiene los issues actualizados de GitHub
+ */
+async function getGitHubIssues() {
+  try {
+    const issues = await octokit.issues.listForRepo({
+      owner: config.githubOwner,
+      repo: config.githubRepo,
+      state: 'all',
+      sort: 'updated',
+      direction: 'desc'
+    });
+
+    // Obtener información adicional del proyecto para cada issue
+    const projectIssues = [];
+    for (const issue of issues.data) {
+      try {
+        // Usar GraphQL para obtener el estado del proyecto
+        const result = await graphqlWithAuth(`
+          query {
+            repository(owner: "${config.githubOwner}", name: "${config.githubRepo}") {
+              issue(number: ${issue.number}) {
+                projectItems(first: 1) {
+                  nodes {
+                    id
+                    fieldValues(first: 8) {
+                      nodes {
+                        ... on ProjectV2ItemFieldSingleSelectValue {
+                          name
+                          field {
+                            ... on ProjectV2SingleSelectField {
+                              name
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        `);
+
+        const projectItem = result.repository.issue.projectItems.nodes[0];
+        const statusField = projectItem?.fieldValues.nodes.find(
+          node => node?.field?.name === 'Status'
+        );
+
+        projectIssues.push({
+          id: issue.node_id,
+          number: issue.number,
+          title: issue.title,
+          body: issue.body,
+          state: issue.state,
+          assignees: issue.assignees.map(assignee => assignee.login),
+          labels: issue.labels.map(label => label.name),
+          lastUpdated: issue.updated_at,
+          projectItemId: projectItem?.id,
+          status: statusField?.name || 'Backlog'
+        });
+      } catch (error) {
+        console.error(`Error obteniendo información del proyecto para issue #${issue.number}:`, error);
+      }
+    }
+
+    return projectIssues;
+  } catch (error) {
+    console.error('Error obteniendo issues de GitHub:', error);
+    throw error;
+  }
+}
+
 module.exports = {
   getProjectInfo,
   findStatusFieldAndOption,
@@ -374,5 +472,7 @@ module.exports = {
   updateIssueInProject,
   updateGitHubIssue,
   closeGitHubIssue,
-  processDeletedTask
+  processDeletedTask,
+  getGitHubIssues,
+  findIssueByTitle
 };
