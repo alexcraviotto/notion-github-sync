@@ -1,0 +1,31 @@
+{
+  "name": "notion-github-sync",
+  "version": "1.0.0",
+  "description": "Sincronizador de tareas entre Notion y GitHub Projects",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "keywords": [
+    "notion",
+    "github",
+    "sync",
+    "projects",
+    "tasks"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@notionhq/client": "^2.2.14",
+    "@octokit/graphql": "^7.0.2",
+    "@octokit/rest": "^20.0.2",
+    "axios": "^1.6.2",
+    "axios-retry": "^4.0.0",
+    "dotenv": "^16.3.1",
+    "node-cron": "^3.0.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}

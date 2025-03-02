@@ -1,0 +1,286 @@
+const { graphql } = require('@octokit/graphql');
+const { Octokit } = require('@octokit/rest');
+const config = require('../config');
+const { mapUser } = require('../utils/mappers');
+
+// Inicializar clientes de GitHub
+const octokit = new Octokit({
+  auth: config.githubToken,
+});
+
+const graphqlWithAuth = graphql.defaults({
+  headers: {
+    authorization: `bearer ${config.githubToken}`,
+  },
+});
+
+/**
+ * Obtiene información del proyecto GitHub
+ */
+async function getProjectInfo() {
+  try {
+    const result = await graphqlWithAuth(`
+      query {
+        user(login: "${config.githubOwner}") {
+          projectV2(number: ${config.githubProjectNumber}) {
+            id
+            fields(first: 20) {
+              nodes {
+                ... on ProjectV2SingleSelectField {
+                  id
+                  name
+                  options {
+                    id
+                    name
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    `);
+    
+    console.log('\n🔍 Opciones de estado en GitHub Project:');
+    const statusField = result.user.projectV2.fields.nodes.find(field => field.name === 'Status');
+    if (statusField && statusField.options) {
+      statusField.options.forEach(option => {
+        console.log(`  - "${option.name}" (ID: ${option.id})`);
+      });
+    }
+    
+    return {
+      projectId: result.user.projectV2.id,
+      fields: result.user.projectV2.fields.nodes
+    };
+  } catch (error) {
+    console.error('Error obteniendo información del proyecto GitHub:', error);
+    throw error;
+  }
+}
+
+/**
+ * Encuentra campo de estado y opción ID
+ */
+function findStatusFieldAndOption(fields, statusName) {
+  const statusField = fields.find(field => field.name === 'Status');
+  if (!statusField) {
+    console.log('⚠️ Campo de estado no encontrado. Campos disponibles:', fields.map(f => f.name));
+    return { fieldId: null, optionId: null };
+  }
+  
+  const statusOption = statusField.options.find(option => option.name === statusName);
+  
+  if (!statusOption) {
+    console.log(`⚠️ Opción de estado "${statusName}" no encontrada`);
+    console.log(`Opciones disponibles: ${statusField.options.map(o => `"${o.name}"`).join(', ')}`);
+  } else {
+    console.log(`✓ Encontrada opción de estado "${statusName}" con ID: ${statusOption.id}`);
+  }
+  
+  return {
+    fieldId: statusField.id,
+    optionId: statusOption ? statusOption.id : null
+  };
+}
+
+/**
+ * Crea un issue en GitHub
+ */
+async function createGitHubIssue(task) {
+  try {
+    const issue = await octokit.issues.create({
+      owner: config.githubOwner,
+      repo: config.githubRepo,
+      title: task.title,
+      body: `Importado desde Notion: ${task.id}`,
+      assignees: task.assignee ? [mapUser(task.assignee)].filter(Boolean) : [],
+    });
+    
+    return issue.data;
+  } catch (error) {
+    console.error('Error creando issue en GitHub:', error);
+    throw error;
+  }
+}
+
+/**
+ * Añade un issue al proyecto de GitHub
+ */
+async function addIssueToProject(issueId, projectInfo, task) {
+  try {
+    const addResult = await graphqlWithAuth(`
+      mutation {
+        addProjectV2ItemById(input: {
+          projectId: "${projectInfo.projectId}"
+          contentId: "${issueId}"
+        }) {
+          item {
+            id
+          }
+        }
+      }
+    `);
+    
+    const itemId = addResult.addProjectV2ItemById.item.id;
+    const statusToUse = task.githubStatus || 'Backlog';
+    
+    const { fieldId, optionId } = findStatusFieldAndOption(
+      projectInfo.fields,
+      statusToUse
+    );
+    
+    if (fieldId && optionId) {
+      await graphqlWithAuth(`
+        mutation {
+          updateProjectV2ItemFieldValue(input: {
+            projectId: "${projectInfo.projectId}"
+            itemId: "${itemId}"
+            fieldId: "${fieldId}"
+            value: { 
+              singleSelectOptionId: "${optionId}"
+            }
+          }) {
+            projectV2Item {
+              id
+            }
+          }
+        }
+      `);
+      console.log(`Estado establecido exitosamente a "${statusToUse}"`);
+    }
+    
+    return itemId;
+  } catch (error) {
+    console.error('Error añadiendo issue al proyecto:', error);
+    throw error;
+  }
+}
+
+/**
+ * Actualiza el estado de un issue en el proyecto
+ */
+async function updateIssueInProject(itemId, projectInfo, status) {
+  try {
+    let githubStatus;
+    
+    if (typeof status === 'object' && status.githubStatus) {
+      githubStatus = status.githubStatus;
+    } else if (status === 'Cancelado') {
+      githubStatus = 'Cancelado';
+    } else {
+      const { mapStatusExact } = require('../utils/mappers');
+      githubStatus = mapStatusExact(status);
+    }
+    
+    const { fieldId, optionId } = findStatusFieldAndOption(
+      projectInfo.fields,
+      githubStatus
+    );
+    
+    if (fieldId && optionId) {
+      await graphqlWithAuth(`
+        mutation {
+          updateProjectV2ItemFieldValue(input: {
+            projectId: "${projectInfo.projectId}"
+            itemId: "${itemId}"
+            fieldId: "${fieldId}"
+            value: { 
+              singleSelectOptionId: "${optionId}"
+            }
+          }) {
+            projectV2Item {
+              id
+            }
+          }
+        }
+      `);
+      console.log(`Estado del issue actualizado a "${githubStatus}"`);
+    }
+  } catch (error) {
+    console.error('Error actualizando issue en proyecto:', error);
+    throw error;
+  }
+}
+
+/**
+ * Actualiza título y descripción de un issue
+ */
+async function updateGitHubIssue(task, issueNumber) {
+  try {
+    let body = task.description || '';
+    
+    if (task.priority) {
+      body += `**Prioridad**: ${task.priority}\n`;
+    }
+    if (task.sprintPlanning) {
+      body += `**Sprint**: ${task.sprintPlanning}\n`;
+    }
+    if (task.dueDate) {
+      body += `**Fecha límite**: ${task.dueDate}\n`;
+    }
+    
+    await octokit.issues.update({
+      owner: config.githubOwner,
+      repo: config.githubRepo,
+      issue_number: issueNumber,
+      title: task.title,
+      body: body,
+      assignees: task.assignee ? [mapUser(task.assignee)].filter(Boolean) : []
+    });
+    
+    console.log(`Actualizado título y descripción del issue #${issueNumber}`);
+  } catch (error) {
+    console.error(`Error actualizando issue #${issueNumber}:`, error);
+    throw error;
+  }
+}
+
+/**
+ * Cierra un issue en GitHub
+ */
+async function closeGitHubIssue(issueNumber) {
+  try {
+    await octokit.issues.update({
+      owner: config.githubOwner,
+      repo: config.githubRepo,
+      issue_number: issueNumber,
+      state: 'closed'
+    });
+    console.log(`Cerrado issue #${issueNumber}`);
+  } catch (error) {
+    console.error(`Error cerrando issue #${issueNumber}:`, error);
+    throw error;
+  }
+}
+
+/**
+ * Procesa tareas eliminadas
+ */
+async function processDeletedTask(task, projectInfo) {
+  try {
+    await updateIssueInProject(
+      task.githubProjectItemId,
+      projectInfo,
+      'Cancelado'
+    );
+    
+    await closeGitHubIssue(task.githubIssueNumber);
+    
+    return true;
+  } catch (error) {
+    console.error(`Error procesando tarea eliminada #${task.githubIssueNumber}:`, error);
+    return false;
+  }
+}
+
+module.exports = {
+  getProjectInfo,
+  findStatusFieldAndOption,
+  createGitHubIssue,
+  addIssueToProject,
+  updateIssueInProject,
+  updateGitHubIssue,
+  closeGitHubIssue,
+  processDeletedTask
+};

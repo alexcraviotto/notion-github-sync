@@ -1,0 +1,20 @@
+{
+  "lastSync": "2025-03-02T12:44:02.492Z",
+  "syncedTasks": [
+    {
+      "notionId": "1aa35a0a-119b-805b-8ff9-ebb8fe672fa1",
+      "githubIssueId": 2889504218,
+      "githubIssueNumber": 13,
+      "githubProjectItemId": "PVTI_lAHOAyxey84AzayyzgX11bk",
+      "title": "Hola",
+      "status": "Sin empezar",
+      "mappedStatus": "Backlog",
+      "assignee": "Alex Craviotto",
+      "priority": "Crítico",
+      "dueDate": null,
+      "lastEdited": "2025-03-02T12:40:00.000Z",
+      "githubStatus": "Backlog",
+      "description": "dasdas"
+    }
+  ]
+}
