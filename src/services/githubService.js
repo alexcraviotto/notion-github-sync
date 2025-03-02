@@ -91,19 +91,26 @@ async function createGitHubIssue(task) {
   try {
     const labels = [];
     if (task.priority) {
+      // Crear o verificar que existe la etiqueta con color
       try {
         await octokit.issues.getLabel({
           owner: config.githubOwner,
           repo: config.githubRepo,
-          name: task.priority
+          name: task.priority.toLowerCase()
         });
       } catch (error) {
         if (error.status === 404) {
-  
+          const colors = {
+            high: 'e11d21',    // Rojo
+            medium: 'fbca04',   // Amarillo
+            low: '009800'      // Verde
+          };
+          
           await octokit.issues.createLabel({
             owner: config.githubOwner,
             repo: config.githubRepo,
-            name: task.priority,
+            name: task.priority.toLowerCase(),
+            color: colors[task.priority.toLowerCase()] || '666666'
           });
         }
       }
@@ -111,18 +118,43 @@ async function createGitHubIssue(task) {
       labels.push(task.priority.toLowerCase());
     }
 
+    const githubUsername = task.assignee ? mapUser(task.assignee) : null;
+    let assignees = [];
+    
+    if (githubUsername) {
+      // Verificar si el usuario tiene acceso al repositorio
+      try {
+        await octokit.repos.checkCollaborator({
+          owner: config.githubOwner,
+          repo: config.githubRepo,
+          username: githubUsername
+        });
+        assignees = [githubUsername];
+      } catch (error) {
+        console.log(`⚠️ El usuario ${githubUsername} no tiene acceso al repositorio. No se puede asignar el issue.`);
+        console.log('Sugerencia: Asegúrate de que el usuario sea colaborador del repositorio en GitHub.');
+      }
+    }
+
     const issue = await octokit.issues.create({
       owner: config.githubOwner,
       repo: config.githubRepo,
       title: task.title,
       body: `Importado desde Notion: ${task.id}`,
-      assignees: task.assignee ? [mapUser(task.assignee)].filter(Boolean) : [],
+      assignees: assignees,
       labels: labels
     });
     
     return issue.data;
   } catch (error) {
-    console.error('Error creando issue en GitHub:', error);
+    if (error.status === 422) {
+      console.error('Error de validación al crear el issue. Verifica que:');
+      console.error('1. Los usuarios asignados tienen acceso al repositorio');
+      console.error('2. Las etiquetas existen en el repositorio');
+      console.error('3. Tienes permisos suficientes en el repositorio');
+    } else {
+      console.error('Error creando issue en GitHub:', error);
+    }
     throw error;
   }
 }
@@ -251,16 +283,40 @@ async function updateGitHubIssue(task, issueNumber) {
         });
       } catch (error) {
         if (error.status === 404) {
-  
+          const colors = {
+            high: 'e11d21',    // Rojo
+            medium: 'fbca04',   // Amarillo
+            low: '009800'      // Verde
+          };
+          
           await octokit.issues.createLabel({
             owner: config.githubOwner,
             repo: config.githubRepo,
             name: task.priority.toLowerCase(),
+            color: colors[task.priority.toLowerCase()] || '666666'
           });
         }
       }
       
       labels.push(task.priority.toLowerCase());
+    }
+
+    const githubUsername = task.assignee ? mapUser(task.assignee) : null;
+    let assignees = [];
+    
+    if (githubUsername) {
+      // Verificar si el usuario tiene acceso al repositorio
+      try {
+        await octokit.repos.checkCollaborator({
+          owner: config.githubOwner,
+          repo: config.githubRepo,
+          username: githubUsername
+        });
+        assignees = [githubUsername];
+      } catch (error) {
+        console.log(`⚠️ El usuario ${githubUsername} no tiene acceso al repositorio. No se puede asignar el issue.`);
+        console.log('Sugerencia: Asegúrate de que el usuario sea colaborador del repositorio en GitHub.');
+      }
     }
 
     await octokit.issues.update({
@@ -269,13 +325,20 @@ async function updateGitHubIssue(task, issueNumber) {
       issue_number: issueNumber,
       title: task.title,
       body: body,
-      assignees: task.assignee ? [mapUser(task.assignee)].filter(Boolean) : [],
+      assignees: assignees,
       labels: labels
     });
     
     console.log(`Actualizado título, descripción y etiquetas del issue #${issueNumber}`);
   } catch (error) {
-    console.error(`Error actualizando issue #${issueNumber}:`, error);
+    if (error.status === 422) {
+      console.error('Error de validación al actualizar el issue. Verifica que:');
+      console.error('1. Los usuarios asignados tienen acceso al repositorio');
+      console.error('2. Las etiquetas existen en el repositorio');
+      console.error('3. Tienes permisos suficientes en el repositorio');
+    } else {
+      console.error(`Error actualizando issue #${issueNumber}:`, error);
+    }
     throw error;
   }
 }

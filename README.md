@@ -1,6 +1,22 @@
-# Notion-GitHub Sync
+# Notion to GitHub Sync
 
-Sincronizador automático de tareas entre Notion y GitHub Projects. Esta herramienta mantiene sincronizadas las tareas de tu base de datos de Notion con un proyecto de GitHub, incluyendo estados, asignaciones y otros metadatos.
+Sincroniza tareas entre Notion y GitHub Projects.
+
+## Configuración
+
+1. **Variables de entorno**:
+   - Copia el archivo `config-templates/.env.example` a `.env` en la raíz del proyecto
+   - Rellena las variables con tus tokens y configuración
+
+2. **Mapeo de usuarios**:
+   - Copia `config-templates/userMappings.example.js` a `src/config/userMappings.js`
+   - Edita el archivo para mapear los nombres de usuario de Notion a GitHub
+   - Formato: `'Nombre en Notion': 'usuario-github'`
+
+3. **Mapeo de estados**:
+   - Copia `config-templates/statusMappings.example.js` a `src/config/statusMappings.js`
+   - Edita los estados para que coincidan con tu configuración
+   - Asegúrate de que los estados de GitHub coincidan con tu Project
 
 ## Características
 
@@ -26,45 +42,30 @@ Sincronizador automático de tareas entre Notion y GitHub Projects. Esta herrami
 
 ## Instalación
 
-1. Clona este repositorio:
-```bash
-git clone <url-del-repositorio>
-cd notion-github-sync
-```
-
-2. Instala las dependencias:
 ```bash
 npm install
 ```
 
-3. Configura las variables de entorno:
-Crea un archivo `.env` en la raíz del proyecto con el siguiente contenido:
-```env
-# Notion
-NOTION_API_KEY=tu_api_key_de_notion
-NOTION_DATABASE_ID=tu_id_de_base_de_datos
-
-# GitHub
-GITHUB_TOKEN=tu_token_de_github
-GITHUB_OWNER=nombre_de_usuario_o_organizacion
-GITHUB_REPO=nombre_del_repositorio
-GITHUB_PROJECT_NUMBER=numero_del_proyecto
-
-# Configuración de sincronización
-SYNC_INTERVAL_CRON="*/5 * * * *"  # Cada 5 minutos por defecto
-```
-
 ## Uso
 
-### Iniciar en modo producción:
 ```bash
 npm start
 ```
 
-### Iniciar en modo desarrollo (con recarga automática):
-```bash
-npm run dev
-```
+Por defecto, la sincronización se ejecuta cada 5 minutos. Puedes modificar este intervalo en el archivo `.env` usando la variable `SYNC_INTERVAL_CRON`.
+
+## Tokens necesarios
+
+### Notion
+1. Crea una integración en https://www.notion.so/my-integrations
+2. Copia el token de la integración a `NOTION_API_KEY`
+3. Comparte tu base de datos de Notion con la integración
+4. Copia el ID de la base de datos a `NOTION_DATABASE_ID`
+
+### GitHub
+1. Crea un token en https://github.com/settings/tokens
+2. Asegúrate de dar permisos de repo y project
+3. Copia el token a `GITHUB_TOKEN`
 
 ## Estructura del Proyecto
 
@@ -91,6 +92,28 @@ Los estados se mapean automáticamente entre Notion y GitHub Projects según la 
 | Completado      | Completado             |
 | Disponible      | Disponible             |
 | Cancelado       | Cancelado              |
+
+## Personalización
+
+### Estados
+Los estados se mapean de Notion a GitHub Projects. Puedes personalizar este mapeo en `src/config/statusMappings.js`. Por ejemplo:
+
+```javascript
+{
+  'Por hacer': 'Backlog',
+  'En progreso': 'In Progress'
+}
+```
+
+### Usuarios
+Los usuarios se mapean de nombres de Notion a usuarios de GitHub. Configura el mapeo en `src/config/userMappings.js`. Por ejemplo:
+
+```javascript
+{
+  'Juan Pérez': 'juanperez-github',
+  'María García': 'mariagarcia123'
+}
+```
 
 ## Contribuir
 

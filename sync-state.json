@@ -1,5 +1,5 @@
 {
-  "lastSync": "2025-03-02T13:02:01.317Z",
+  "lastSync": "2025-03-02T13:41:07.595Z",
   "syncedTasks": [
     {
       "notionId": "1aa35a0a-119b-805b-8ff9-ebb8fe672fa1",
@@ -71,6 +71,48 @@
       "priority": null,
       "dueDate": null,
       "lastEdited": "2025-03-02T13:01:00.000Z"
+    },
+    {
+      "notionId": "1aa35a0a-119b-809e-a133-cafd6a30ab93",
+      "githubIssueId": 2889538921,
+      "githubIssueNumber": 22,
+      "githubProjectItemId": "PVTI_lAHOAyxey84AzayyzgX14Xs",
+      "title": "ASignado a miguel",
+      "description": "asdasd",
+      "status": "En revision",
+      "githubStatus": "En revision",
+      "assignee": "Miguel ",
+      "priority": null,
+      "dueDate": null,
+      "lastEdited": "2025-03-02T13:06:00.000Z"
+    },
+    {
+      "notionId": "1aa35a0a-119b-80bf-bf03-c8d34fb6cb9a",
+      "githubIssueId": 2889540576,
+      "githubIssueNumber": 26,
+      "githubProjectItemId": "PVTI_lAHOAyxey84AzayyzgX14fE",
+      "title": "sadasdasd",
+      "description": "No se ha proporcionado descripción",
+      "status": "Preparado",
+      "githubStatus": "Disponible",
+      "assignee": "Miguel ",
+      "priority": null,
+      "dueDate": null,
+      "lastEdited": "2025-03-02T13:10:00.000Z"
+    },
+    {
+      "notionId": "1aa35a0a-119b-8089-8311-d4c12ab6bfd4",
+      "githubIssueId": 2889558674,
+      "githubIssueNumber": 27,
+      "githubProjectItemId": "PVTI_lAHOAyxey84AzayyzgX15i4",
+      "title": "sasdasd",
+      "description": "No se ha proporcionado descripción",
+      "status": "Sin empezar",
+      "githubStatus": "Backlog",
+      "assignee": "Miguel ",
+      "priority": null,
+      "dueDate": null,
+      "lastEdited": "2025-03-02T13:41:00.000Z"
     }
   ]
 }
