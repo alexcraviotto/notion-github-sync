@@ -1,70 +1,54 @@
 {
-  "lastSync": "2025-03-02T13:57:53.237Z",
+  "lastSync": null,
   "syncedTasks": [
     {
-      "notionId": "1aa35a0a-119b-8032-9c1e-dfc59799dae5",
-      "githubIssueId": 2889564321,
-      "githubIssueNumber": 36,
-      "githubProjectItemId": "PVTI_lAHOAyxey84AzayyzgX159Q",
-      "title": "asdasd",
-      "description": "No se ha proporcionado descripción",
-      "status": "Sin empezar",
-      "githubStatus": "Backlog",
-      "priority": null,
-      "dueDate": null,
-      "lastEdited": "2025-03-02T13:52:00.000Z"
+      "notionId": "1aa35a0a-119b-80db-a7a7-f8ccdfedc0c8",
+      "githubIssueId": 2889572238,
+      "githubIssueNumber": 43,
+      "githubProjectItemId": "PVTI_lAHOAyxey84AzayyzgX16gw",
+      "lastNotionEdit": "2025-03-02T14:07:00.000Z"
     },
     {
-      "notionId": "1aa35a0a-119b-8091-bdab-f9c439566f9c",
-      "githubIssueId": 2889564340,
-      "githubIssueNumber": 37,
-      "githubProjectItemId": "PVTI_lAHOAyxey84AzayyzgX159Y",
-      "title": "asdasd",
-      "description": "No se ha proporcionado descripción",
-      "status": "En progreso",
-      "githubStatus": "En progreso",
-      "priority": null,
-      "dueDate": null,
-      "lastEdited": "2025-03-02T13:51:00.000Z"
-    },
-    {
-      "notionId": "1aa35a0a-119b-8027-9448-c3925509082f",
-      "githubIssueId": 2889564354,
-      "githubIssueNumber": 38,
-      "githubProjectItemId": "PVTI_lAHOAyxey84AzayyzgX159g",
-      "title": "Fedescpio",
-      "description": "asdasdasd",
-      "status": "En revision",
-      "githubStatus": "En revision",
-      "priority": "Crítico",
-      "dueDate": null,
-      "lastEdited": "2025-03-02T13:51:00.000Z"
-    },
-    {
-      "notionId": "1aa35a0a-119b-806f-b375-e832001403cc",
-      "githubIssueId": 2889564374,
-      "githubIssueNumber": 39,
-      "githubProjectItemId": "PVTI_lAHOAyxey84AzayyzgX159o",
-      "title": "Federico",
-      "description": "DASd",
-      "status": "En progreso",
-      "githubStatus": "En progreso",
-      "priority": "Prioridad media",
-      "dueDate": null,
-      "lastEdited": "2025-03-02T13:48:00.000Z"
+      "notionId": "1aa35a0a-119b-803d-86e7-c565bc7c81f2",
+      "githubIssueId": 2889572260,
+      "githubIssueNumber": 44,
+      "githubProjectItemId": "PVTI_lAHOAyxey84AzayyzgX16g4",
+      "lastNotionEdit": "2025-03-02T14:06:00.000Z"
     },
     {
       "notionId": "1aa35a0a-119b-8053-b8ef-cab239c64812",
-      "githubIssueId": 2889567166,
-      "githubIssueNumber": 40,
-      "githubProjectItemId": "PVTI_lAHOAyxey84AzayyzgX16Kg",
-      "title": "DOs",
-      "description": "asdasd",
-      "status": "En revision",
-      "githubStatus": "En revision",
-      "priority": "Alta prioridad",
-      "dueDate": null,
-      "lastEdited": "2025-03-02T13:57:00.000Z"
+      "githubIssueId": 2889572276,
+      "githubIssueNumber": 45,
+      "githubProjectItemId": "PVTI_lAHOAyxey84AzayyzgX16hA",
+      "lastNotionEdit": "2025-03-02T13:57:00.000Z"
+    },
+    {
+      "notionId": "1aa35a0a-119b-8032-9c1e-dfc59799dae5",
+      "githubIssueId": 2889572294,
+      "githubIssueNumber": 46,
+      "githubProjectItemId": "PVTI_lAHOAyxey84AzayyzgX16hI",
+      "lastNotionEdit": "2025-03-02T13:52:00.000Z"
+    },
+    {
+      "notionId": "1aa35a0a-119b-8091-bdab-f9c439566f9c",
+      "githubIssueId": 2889572307,
+      "githubIssueNumber": 47,
+      "githubProjectItemId": "PVTI_lAHOAyxey84AzayyzgX16hM",
+      "lastNotionEdit": "2025-03-02T13:51:00.000Z"
+    },
+    {
+      "notionId": "1aa35a0a-119b-8027-9448-c3925509082f",
+      "githubIssueId": 2889572325,
+      "githubIssueNumber": 48,
+      "githubProjectItemId": "PVTI_lAHOAyxey84AzayyzgX16hY",
+      "lastNotionEdit": "2025-03-02T13:51:00.000Z"
+    },
+    {
+      "notionId": "1aa35a0a-119b-806f-b375-e832001403cc",
+      "githubIssueId": 2889572344,
+      "githubIssueNumber": 49,
+      "githubProjectItemId": "PVTI_lAHOAyxey84AzayyzgX16hc",
+      "lastNotionEdit": "2025-03-02T13:48:00.000Z"
     }
   ]
 }
