@@ -22,16 +22,9 @@ async function getNotionEntries() {
     return response.results.map(page => {
       const title = page.properties.Nombre?.title?.[0]?.plain_text || 'Sin título';
       const description = page.properties.Descripcion?.rich_text[0]?.text.content || 'No se ha proporcionado descripción';
-      console.log(`[${title}] Descripción: ${description}`);
       const status = page.properties.Estado?.status.name || 'Sin Empezar';
-      console.log(page.properties);
-      
-      // Get all assignees instead of just the first one
       const assignees = page.properties['Asignado a']?.people?.map(person => person.name) || [];
-      
       const priority = page.properties.Prioridad?.select?.name || null;
-      console.log(page.properties.Prioridad);
-      console.log('Asignados:', assignees, 'Prioridad:', priority);
       
       let dueDate = null;
       if (page.properties['Fecha Limite']?.date) {
@@ -39,7 +32,6 @@ async function getNotionEntries() {
       }
       
       const githubStatus = mapStatusExact(status);
-      console.log(`[${title}] Estado en Notion: "${status}" -> GitHub Project: "${githubStatus}"`);
       
       return {
         id: page.id,
@@ -47,7 +39,7 @@ async function getNotionEntries() {
         status,
         description,
         githubStatus,
-        assignees, // Now returning array of assignees
+        assignees,
         priority,
         dueDate,
         lastEdited: page.last_edited_time,

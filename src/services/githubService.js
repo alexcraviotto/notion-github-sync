@@ -41,14 +41,6 @@ async function getProjectInfo() {
       }
     `);
     
-    console.log('\n🔍 Opciones de estado en GitHub Project:');
-    const statusField = result.user.projectV2.fields.nodes.find(field => field.name === 'Status');
-    if (statusField && statusField.options) {
-      statusField.options.forEach(option => {
-        console.log(`  - "${option.name}" (ID: ${option.id})`);
-      });
-    }
-    
     return {
       projectId: result.user.projectV2.id,
       fields: result.user.projectV2.fields.nodes
@@ -72,10 +64,7 @@ function findStatusFieldAndOption(fields, statusName) {
   const statusOption = statusField.options.find(option => option.name === statusName);
   
   if (!statusOption) {
-    console.log(`⚠️ Opción de estado "${statusName}" no encontrada`);
-    console.log(`Opciones disponibles: ${statusField.options.map(o => `"${o.name}"`).join(', ')}`);
-  } else {
-    console.log(`✓ Encontrada opción de estado "${statusName}" con ID: ${statusOption.id}`);
+    console.log(`⚠️ Opción de estado "${statusName}" no encontrada. Opciones disponibles: ${statusField.options.map(o => o.name).join(', ')}`);
   }
   
   return {
@@ -91,7 +80,6 @@ async function createGitHubIssue(task) {
   try {
     const labels = [];
     if (task.priority) {
-      // Crear o verificar que existe la etiqueta con color
       try {
         await octokit.issues.getLabel({
           owner: config.githubOwner,
@@ -101,9 +89,9 @@ async function createGitHubIssue(task) {
       } catch (error) {
         if (error.status === 404) {
           const colors = {
-            high: 'e11d21',    // Rojo
-            medium: 'fbca04',   // Amarillo
-            low: '009800'      // Verde
+            high: 'e11d21',
+            medium: 'fbca04',
+            low: '009800'
           };
           
           await octokit.issues.createLabel({
@@ -122,7 +110,6 @@ async function createGitHubIssue(task) {
     let assignees = [];
     
     for (const username of githubUsernames) {
-      // Verificar si el usuario tiene acceso al repositorio
       try {
         await octokit.repos.checkCollaborator({
           owner: config.githubOwner,
@@ -136,6 +123,7 @@ async function createGitHubIssue(task) {
       }
     }
 
+    console.log(`Creando issue: ${task.title}`);
     const issue = await octokit.issues.create({
       owner: config.githubOwner,
       repo: config.githubRepo,
@@ -202,7 +190,6 @@ async function addIssueToProject(issueId, projectInfo, task) {
           }
         }
       `);
-      console.log(`Estado establecido exitosamente a "${statusToUse}"`);
     }
     
     return itemId;
@@ -274,7 +261,6 @@ async function updateGitHubIssue(task, issueNumber) {
     
     const labels = [];
     if (task.priority) {
-      // Verificar que la etiqueta existe con el color correcto
       try {
         await octokit.issues.getLabel({
           owner: config.githubOwner,
@@ -284,9 +270,9 @@ async function updateGitHubIssue(task, issueNumber) {
       } catch (error) {
         if (error.status === 404) {
           const colors = {
-            high: 'e11d21',    // Rojo
-            medium: 'fbca04',   // Amarillo
-            low: '009800'      // Verde
+            high: 'e11d21',
+            medium: 'fbca04',
+            low: '009800'
           };
           
           await octokit.issues.createLabel({
@@ -305,7 +291,6 @@ async function updateGitHubIssue(task, issueNumber) {
     let assignees = [];
     
     for (const username of githubUsernames) {
-      // Verificar si el usuario tiene acceso al repositorio
       try {
         await octokit.repos.checkCollaborator({
           owner: config.githubOwner,
@@ -329,7 +314,7 @@ async function updateGitHubIssue(task, issueNumber) {
       labels: labels
     });
     
-    console.log(`Actualizado título, descripción y etiquetas del issue #${issueNumber}`);
+    console.log(`Actualizado issue #${issueNumber}`);
   } catch (error) {
     if (error.status === 422) {
       console.error('Error de validación al actualizar el issue. Verifica que:');
