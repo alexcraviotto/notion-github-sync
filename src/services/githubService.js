@@ -89,12 +89,35 @@ function findStatusFieldAndOption(fields, statusName) {
  */
 async function createGitHubIssue(task) {
   try {
+    const labels = [];
+    if (task.priority) {
+      try {
+        await octokit.issues.getLabel({
+          owner: config.githubOwner,
+          repo: config.githubRepo,
+          name: task.priority
+        });
+      } catch (error) {
+        if (error.status === 404) {
+  
+          await octokit.issues.createLabel({
+            owner: config.githubOwner,
+            repo: config.githubRepo,
+            name: task.priority,
+          });
+        }
+      }
+      
+      labels.push(task.priority.toLowerCase());
+    }
+
     const issue = await octokit.issues.create({
       owner: config.githubOwner,
       repo: config.githubRepo,
       title: task.title,
       body: `Importado desde Notion: ${task.id}`,
       assignees: task.assignee ? [mapUser(task.assignee)].filter(Boolean) : [],
+      labels: labels
     });
     
     return issue.data;
@@ -210,9 +233,6 @@ async function updateGitHubIssue(task, issueNumber) {
   try {
     let body = task.description || '';
     
-    if (task.priority) {
-      body += `**Prioridad**: ${task.priority}\n`;
-    }
     if (task.sprintPlanning) {
       body += `**Sprint**: ${task.sprintPlanning}\n`;
     }
@@ -220,16 +240,40 @@ async function updateGitHubIssue(task, issueNumber) {
       body += `**Fecha límite**: ${task.dueDate}\n`;
     }
     
+    const labels = [];
+    if (task.priority) {
+      // Verificar que la etiqueta existe con el color correcto
+      try {
+        await octokit.issues.getLabel({
+          owner: config.githubOwner,
+          repo: config.githubRepo,
+          name: task.priority.toLowerCase()
+        });
+      } catch (error) {
+        if (error.status === 404) {
+  
+          await octokit.issues.createLabel({
+            owner: config.githubOwner,
+            repo: config.githubRepo,
+            name: task.priority.toLowerCase(),
+          });
+        }
+      }
+      
+      labels.push(task.priority.toLowerCase());
+    }
+
     await octokit.issues.update({
       owner: config.githubOwner,
       repo: config.githubRepo,
       issue_number: issueNumber,
       title: task.title,
       body: body,
-      assignees: task.assignee ? [mapUser(task.assignee)].filter(Boolean) : []
+      assignees: task.assignee ? [mapUser(task.assignee)].filter(Boolean) : [],
+      labels: labels
     });
     
-    console.log(`Actualizado título y descripción del issue #${issueNumber}`);
+    console.log(`Actualizado título, descripción y etiquetas del issue #${issueNumber}`);
   } catch (error) {
     console.error(`Error actualizando issue #${issueNumber}:`, error);
     throw error;
@@ -283,4 +327,4 @@ module.exports = {
   updateGitHubIssue,
   closeGitHubIssue,
   processDeletedTask
-};
+};c

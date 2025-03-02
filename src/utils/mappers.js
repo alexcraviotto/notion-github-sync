@@ -9,18 +9,13 @@ function mapStatusExact(notionStatus) {
     'Sin Empezar': 'Backlog',
     'En progreso': 'En progreso', 
     'En proceso': 'En progreso',
-    'En revisión': 'En revision',
+    'En revision': 'En revision',
     'Completado': 'Completado',
     'Terminado': 'Completado',
     'Preparado': 'Disponible',
     'Disponible': 'Disponible',
     'Cancelado': 'Cancelado',
-    // También agregar mapeos en inglés para compatibilidad
-    'In Progress': 'En progreso',
-    'To Do': 'Backlog',
-    'Ready': 'Disponible',
-    'Done': 'Completado',
-    'Review': 'En revision'
+   
   };
 
   // Si encontramos un mapeo exacto, lo usamos

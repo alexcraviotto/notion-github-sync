@@ -21,7 +21,7 @@ async function getNotionEntries() {
     
     return response.results.map(page => {
       const title = page.properties.Nombre?.title?.[0]?.plain_text || 'Sin título';
-      const description = page.properties.Descripcion?.rich_text[0].text.content || '';
+      const description = page.properties.Descripcion?.rich_text[0]?.text.content || 'No se ha proporcionado descripción';
       console.log(`[${title}] Descripción: ${description
       }`);
       const status = page.properties.Estado?.status.name || 'Sin Empezar';
