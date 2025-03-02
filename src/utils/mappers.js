@@ -35,13 +35,20 @@ function mapStatusExact(notionStatus) {
  * @returns {string|null} Nombre de usuario en GitHub o null si no hay mapeo
  */
 function mapUser(notionUser) {
-  // Este es un ejemplo simplificado - puedes almacenar este mapeo en un archivo de configuración
   const userMap = {
-    // 'Nombre Usuario Notion': 'nombre-usuario-github',
-    // Agregar más mapeos aquí
+    'Alex Craviotto': 'alexcraviotto',
+    // Puedes agregar más mapeos aquí siguiendo el mismo formato:
+    // 'Nombre en Notion': 'usuario-github'
   };
   
-  return userMap[notionUser] || null; // Retorna null si no se encuentra un mapeo
+  if (!notionUser) return null;
+  
+  const githubUser = userMap[notionUser];
+  if (!githubUser) {
+    console.log(`⚠️ No se encontró mapeo para el usuario de Notion: ${notionUser}`);
+  }
+  
+  return githubUser || null; // Retorna null si no se encuentra un mapeo
 }
 
 module.exports = {

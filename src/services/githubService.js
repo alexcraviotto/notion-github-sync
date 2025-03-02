@@ -327,4 +327,4 @@ module.exports = {
   updateGitHubIssue,
   closeGitHubIssue,
   processDeletedTask
-};c
+};

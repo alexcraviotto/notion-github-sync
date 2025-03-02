@@ -1,5 +1,5 @@
 {
-  "lastSync": "2025-03-02T12:57:31.252Z",
+  "lastSync": "2025-03-02T13:02:01.317Z",
   "syncedTasks": [
     {
       "notionId": "1aa35a0a-119b-805b-8ff9-ebb8fe672fa1",
@@ -51,12 +51,26 @@
       "githubProjectItemId": "PVTI_lAHOAyxey84AzayyzgX13sw",
       "title": "Tercer",
       "description": "ASDASDASSD",
-      "status": "Cancelado",
-      "githubStatus": "Cancelado",
+      "status": "Completado",
+      "githubStatus": "Completado",
       "assignee": "Alex Craviotto",
       "priority": "Alta prioridad",
       "dueDate": null,
-      "lastEdited": "2025-03-02T12:57:00.000Z"
+      "lastEdited": "2025-03-02T13:00:00.000Z"
+    },
+    {
+      "notionId": "1aa35a0a-119b-8072-97b6-fadff9947abc",
+      "githubIssueId": 2889535595,
+      "githubIssueNumber": 21,
+      "githubProjectItemId": "PVTI_lAHOAyxey84AzayyzgX14FI",
+      "title": "Asign",
+      "description": "sadasdasd",
+      "status": "Preparado",
+      "githubStatus": "Disponible",
+      "assignee": "Alex Craviotto",
+      "priority": null,
+      "dueDate": null,
+      "lastEdited": "2025-03-02T13:01:00.000Z"
     }
   ]
 }
