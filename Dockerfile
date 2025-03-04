@@ -9,7 +9,7 @@ COPY package*.json ./
 COPY .env ./
 
 # Instalar dependencias
-RUN npm ci --only=production
+run npm install
 
 # Copiar código fuente
 COPY . .
