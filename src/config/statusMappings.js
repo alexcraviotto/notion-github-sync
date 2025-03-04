@@ -3,7 +3,7 @@
  * Formato: 'Estado en Notion': 'Estado en GitHub Projects'
  */
 const statusMappings = {
-  'Sin Empezar': 'Backlog',
+  'Backlog': 'Backlog',
   'En progreso': 'En progreso',
   'En proceso': 'En progreso',
   'En revision': 'En revision',
@@ -11,7 +11,13 @@ const statusMappings = {
   'Terminado': 'Completado',
   'Preparado': 'Disponible',
   'Disponible': 'Disponible',
-  'Cancelado': 'Cancelado'
+  'Cancelado': 'Cancelado',
+  'Backlog': 'Backlog',
+  'In progress': 'In progress',
+  'In review': 'In review',
+  'Done': 'Done',
+  'Ready': 'Ready',
+  'Canceled': 'Canceled',
 };
 
 // Estado por defecto si no se encuentra un mapeo

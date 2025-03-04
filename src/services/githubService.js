@@ -40,7 +40,7 @@ async function getProjectInfo() {
         }
       }
     `);
-    
+
     return {
       projectId: result.user.projectV2.id,
       fields: result.user.projectV2.fields.nodes
@@ -60,13 +60,13 @@ function findStatusFieldAndOption(fields, statusName) {
     console.log('⚠️ Campo de estado no encontrado. Campos disponibles:', fields.map(f => f.name));
     return { fieldId: null, optionId: null };
   }
-  
+
   const statusOption = statusField.options.find(option => option.name === statusName);
-  
+
   if (!statusOption) {
     console.log(`⚠️ Opción de estado "${statusName}" no encontrada. Opciones disponibles: ${statusField.options.map(o => o.name).join(', ')}`);
   }
-  
+
   return {
     fieldId: statusField.id,
     optionId: statusOption ? statusOption.id : null
@@ -118,7 +118,7 @@ async function createGitHubIssue(task) {
             medium: 'fbca04',
             low: '009800'
           };
-          
+
           await octokit.issues.createLabel({
             owner: config.githubOwner,
             repo: config.githubRepo,
@@ -127,13 +127,13 @@ async function createGitHubIssue(task) {
           });
         }
       }
-      
+
       labels.push(task.priority.toLowerCase());
     }
 
     const githubUsernames = task.assignees ? mapUsers(task.assignees) : [];
     let assignees = [];
-    
+
     for (const username of githubUsernames) {
       try {
         await octokit.repos.checkCollaborator({
@@ -157,7 +157,7 @@ async function createGitHubIssue(task) {
       assignees: assignees,
       labels: labels
     });
-    
+
     return issue.data;
   } catch (error) {
     if (error.status === 422) {
@@ -189,15 +189,15 @@ async function addIssueToProject(issueId, projectInfo, task) {
         }
       }
     `);
-    
+
     const itemId = addResult.addProjectV2ItemById.item.id;
     const statusToUse = task.githubStatus || 'Backlog';
-    
+
     const { fieldId, optionId } = findStatusFieldAndOption(
       projectInfo.fields,
       statusToUse
     );
-    
+
     if (fieldId && optionId) {
       await graphqlWithAuth(`
         mutation {
@@ -216,7 +216,7 @@ async function addIssueToProject(issueId, projectInfo, task) {
         }
       `);
     }
-    
+
     return itemId;
   } catch (error) {
     console.error('Error añadiendo issue al proyecto:', error);
@@ -230,21 +230,25 @@ async function addIssueToProject(issueId, projectInfo, task) {
 async function updateIssueInProject(itemId, projectInfo, status) {
   try {
     let githubStatus;
-    
+
     if (typeof status === 'object' && status.githubStatus) {
       githubStatus = status.githubStatus;
-    } else if (status === 'Cancelado') {
+    }
+    else if (status === 'Canceled') {
+      githubStatus = 'Canceled';
+    }
+    else if (status === 'Cancelado') {
       githubStatus = 'Cancelado';
     } else {
       const { mapStatusExact } = require('../utils/mappers');
       githubStatus = mapStatusExact(status);
     }
-    
+
     const { fieldId, optionId } = findStatusFieldAndOption(
       projectInfo.fields,
       githubStatus
     );
-    
+
     if (fieldId && optionId) {
       await graphqlWithAuth(`
         mutation {
@@ -276,14 +280,14 @@ async function updateIssueInProject(itemId, projectInfo, status) {
 async function updateGitHubIssue(task, issueNumber) {
   try {
     let body = task.description || '';
-    
+
     if (task.sprintPlanning) {
       body += `**Sprint**: ${task.sprintPlanning}\n`;
     }
     if (task.dueDate) {
       body += `**Fecha límite**: ${task.dueDate}\n`;
     }
-    
+
     const labels = [];
     if (task.priority) {
       try {
@@ -299,7 +303,7 @@ async function updateGitHubIssue(task, issueNumber) {
             medium: 'fbca04',
             low: '009800'
           };
-          
+
           await octokit.issues.createLabel({
             owner: config.githubOwner,
             repo: config.githubRepo,
@@ -308,13 +312,13 @@ async function updateGitHubIssue(task, issueNumber) {
           });
         }
       }
-      
+
       labels.push(task.priority.toLowerCase());
     }
 
     const githubUsernames = task.assignees ? mapUsers(task.assignees) : [];
     let assignees = [];
-    
+
     for (const username of githubUsernames) {
       try {
         await octokit.repos.checkCollaborator({
@@ -338,7 +342,7 @@ async function updateGitHubIssue(task, issueNumber) {
       assignees: assignees,
       labels: labels
     });
-    
+
     console.log(`Actualizado issue #${issueNumber}`);
   } catch (error) {
     if (error.status === 422) {
@@ -379,11 +383,11 @@ async function processDeletedTask(task, projectInfo) {
     await updateIssueInProject(
       task.githubProjectItemId,
       projectInfo,
-      'Cancelado'
+      'Canceled'
     );
-    
+
     await closeGitHubIssue(task.githubIssueNumber);
-    
+
     return true;
   } catch (error) {
     console.error(`Error procesando tarea eliminada #${task.githubIssueNumber}:`, error);
