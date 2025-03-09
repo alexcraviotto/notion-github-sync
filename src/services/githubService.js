@@ -96,7 +96,6 @@ async function findIssueByTitle(title) {
  */
 async function createGitHubIssue(task) {
   try {
-    // Verificar si ya existe un issue con el mismo título
     const existingIssue = await findIssueByTitle(task.title);
     if (existingIssue) {
       console.log(`ℹ️ Ya existe un issue con el título: ${task.title}`);

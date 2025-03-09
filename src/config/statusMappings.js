@@ -20,7 +20,6 @@ const statusMappings = {
   'Canceled': 'Canceled',
 };
 
-// Estado por defecto si no se encuentra un mapeo
 const defaultStatus = 'Backlog';
 
 module.exports = {

@@ -2,7 +2,6 @@ const fs = require('fs').promises;
 const path = require('path');
 const config = require('../config');
 
-// Ruta completa al archivo de estado
 const STATE_FILE = path.resolve(config.stateFilePath);
 
 /**
@@ -14,7 +13,6 @@ async function getState() {
     const data = await fs.readFile(STATE_FILE, 'utf8');
     return JSON.parse(data);
   } catch (error) {
-    // Si el archivo no existe, retornar un estado vacío
     return {
       lastSync: null,
       syncedTasks: []

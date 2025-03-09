@@ -1,6 +1,5 @@
 require('dotenv').config();
 
-// Configuración para la aplicación
 const config = {
   // Notion
   notionApiKey: process.env.NOTION_API_KEY,

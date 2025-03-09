@@ -3,8 +3,7 @@
  * Formato: 'Nombre en Notion': 'usuario-github'
  */
 const userMappings = {
-  'Alex Craviotto': 'alexcraviotto',
-  'Miguel': 'Miguel07Alm'
+  'Pedro Martinez': 'pedromartinez',
   // Añade más usuarios aquí
 };
 

@@ -2,7 +2,6 @@ const { Client } = require('@notionhq/client');
 const config = require('../config');
 const { mapStatusExact, mapGithubUsers } = require('../utils/mappers');
 
-// Inicializar cliente de Notion
 const notion = new Client({
   auth: config.notionApiKey,
 });
@@ -110,11 +109,9 @@ async function updateNotionPage(pageId, data) {
     }
     
     if (data.assignees && data.assignees.length > 0) {
-      // Mapear usuarios de GitHub a Notion
       const notionUsers = mapGithubUsers(data.assignees);
       const users = [];
       
-      // Obtener los IDs de usuario de Notion
       const response = await notion.users.list();
       for (const notionUser of notionUsers) {
         const user = response.results.find(u => u.name === notionUser);
@@ -149,7 +146,6 @@ async function updateNotionPage(pageId, data) {
  */
 async function createNotionPage(issueData) {
   try {
-    // Verificar si ya existe una página con el mismo título
     const existingPage = await findPageByTitle(issueData.title);
     if (existingPage) {
       console.log(`ℹ️ Ya existe una página con el título: ${issueData.title}`);
@@ -179,11 +175,9 @@ async function createNotionPage(issueData) {
     }
 
     if (issueData.assignees && issueData.assignees.length > 0) {
-      // Mapear usuarios de GitHub a Notion
       const notionUsers = mapGithubUsers(issueData.assignees);
       const users = [];
       
-      // Obtener los IDs de usuario de Notion
       const response = await notion.users.list();
       for (const notionUser of notionUsers) {
         const user = response.results.find(u => u.name === notionUser);

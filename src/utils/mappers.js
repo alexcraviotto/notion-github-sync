@@ -1,7 +1,6 @@
 const { statusMappings, defaultStatus } = require('../config/statusMappings');
 const userMappings = require('../config/userMappings');
 
-// Crear mapeo inverso para usuarios (GitHub -> Notion)
 const reverseUserMappings = Object.entries(userMappings).reduce((acc, [notionUser, githubUser]) => {
   acc[githubUser] = notionUser;
   return acc;
